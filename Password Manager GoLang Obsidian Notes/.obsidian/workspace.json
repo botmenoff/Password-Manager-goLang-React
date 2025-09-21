@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "964b68efb3b5d4d1",
@@ -171,8 +172,10 @@
   },
   "active": "edf45da71cbd3f19",
   "lastOpenFiles": [
-    "Bienvenido.md",
+    "Proyecto.md",
+    "Bibliografia.md",
     "GoLang.md",
+    "Bienvenido.md",
     "cree un enlace.md"
   ]
 }
