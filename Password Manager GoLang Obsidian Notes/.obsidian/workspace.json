@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "GoLang.md",
+                "file": "Bibliografia.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "GoLang"
+              "title": "Bibliografia"
             }
           }
         ]
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "964b68efb3b5d4d1",
@@ -172,9 +171,9 @@
   },
   "active": "edf45da71cbd3f19",
   "lastOpenFiles": [
+    "GoLang.md",
     "Proyecto.md",
     "Bibliografia.md",
-    "GoLang.md",
     "Bienvenido.md",
     "cree un enlace.md"
   ]
