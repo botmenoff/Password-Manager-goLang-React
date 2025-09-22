@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Bibliografia.md",
+                "file": "Proyecto.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Bibliografia"
+              "title": "Proyecto"
             }
           }
         ]
@@ -171,9 +171,9 @@
   },
   "active": "edf45da71cbd3f19",
   "lastOpenFiles": [
+    "Bibliografia.md",
     "GoLang.md",
     "Proyecto.md",
-    "Bibliografia.md",
     "Bienvenido.md",
     "cree un enlace.md"
   ]
