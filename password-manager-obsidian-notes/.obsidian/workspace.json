@@ -49,7 +49,8 @@
               "title": "Bibliografia"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -198,11 +199,11 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "8c3ca6d5462d9e89",
+  "active": "645dc4a0fc217516",
   "lastOpenFiles": [
-    "Proyecto.md",
-    "GoLang.md",
     "Bibliografia.md",
+    "GoLang.md",
+    "Proyecto.md",
     "Bienvenido.md",
     "cree un enlace.md"
   ]

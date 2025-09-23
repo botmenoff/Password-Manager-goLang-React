@@ -3,6 +3,7 @@ https://www.youtube.com/watch?v=1ZbQS6pOlSQ
 https://go.dev/tour/welcome/1
 https://go.dev/tour/moretypes/8
 https://github.com/Melkeydev/go-blueprint
+https://www.youtube.com/watch?v=ERZadn9artM&t=1994s
 
 
 docker exec -it password-manager-backend-mysql_bp-1 mysql -uroot -p

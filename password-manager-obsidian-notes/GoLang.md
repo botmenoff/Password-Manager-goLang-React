@@ -126,7 +126,10 @@ fmt.Println(sub)
 
 ```
 
-## Propiedades
+### Packages
+
+## GoRoutines
+
 ### Defer
 El defer se usa para retrasar la ejecución de una línea de código y es útil para cerrar conexiones y cosas similares.
 ```Go

@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	userroutes "password-manager-backend/cmd/api/routes"
+	"password-manager-backend/cmd/api/routes"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	{
 		v1.GET("/", s.HelloWorldHandler)
 		v1.GET("/health", s.healthHandler)
-		userroutes.UserRoutes(v1)
+		routes.UserRoutes(v1, s.db.DB())
 	}
 
 	return r
