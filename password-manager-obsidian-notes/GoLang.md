@@ -49,6 +49,7 @@ func main() {
 	}
 }
 ```
+
 ### If
 En Go podemos asignar variables en los if y se pueden usar dentro del scope del mismo
 ```Go
@@ -124,6 +125,7 @@ sub := s[1:4]           // slicing → [2 3 4]
 fmt.Println(sub)
 
 ```
+
 ## Propiedades
 ### Defer
 El defer se usa para retrasar la ejecución de una línea de código y es útil para cerrar conexiones y cosas similares.
@@ -177,6 +179,32 @@ complex64 complex128
 - `0` for numeric types,
 - `false` for the boolean type, and
 - `""` (the empty string) for strings.
+
+# API Rest + Gin
+## Controllers
+
+## Routes
+
+## Models
+Los campos de los modelos siempre tiene que empezar por mayúscula para ser exportados y accesibles desde otros paquetes. Se usa el json: para indicar como **serializar**  este campo al convertirse de struct a JSON
+```Go
+package database
+
+import "database/sql"
+
+type UserModel struct {
+	DB *sql.DB
+}
+
+type User struct {
+	ID       int    `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"-"`
+	Username string `json:"username"`
+	Icon     string `json:"icon"`
+}
+```
+
 # Comandos de Go
 ```Shell
 go run rutaArchivo
