@@ -21,7 +21,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	var register models.RegisterRequest
 	// Validar que se ha mandado correctamente
 	if err := c.ShouldBindJSON(&register); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No body sent"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No body sent or malformed body"})
 		return
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(register.Password), bcrypt.DefaultCost)
@@ -36,7 +36,8 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		Username: register.Username,
 		Icon:     icon,
 	}
-	err = models.User.Insert(&user) // Le pasamos un puntero del objeto que acabamos de crear
+	userModel := models.UserModel{DB: uc.DB} // o donde tengas tu *sql.DB
+	err = userModel.Insert(&user)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error inserting user: " + err.Error()})
@@ -44,4 +45,20 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, user)
+}
+
+func (uc *UserController) LoginUser(c *gin.Context) {
+	var body models.LoginRequest
+	// Validar que se ha mandado correctamente en el body
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No body sent or malformed body"})
+		return
+	}
+
+	userModel := models.UserModel{DB: uc.DB} // o donde tengas tu *sql.DB
+	// Buscar el usuario por email
+	user, err := userModel.GetUserFromEmail(body.Email)
+
+	c.JSON(http.StatusAccepted, err)
+
 }

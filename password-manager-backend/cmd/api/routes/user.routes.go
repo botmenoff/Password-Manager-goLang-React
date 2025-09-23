@@ -12,6 +12,7 @@ func UserRoutes(rg *gin.RouterGroup, db *sql.DB) {
 	userController := controllers.UserController{DB: db}
 	{
 		users.GET("/", controllers.GetAllUsers)
-		users.POST("/auth", userController.CreateUser)
+		users.POST("/auth/register", userController.CreateUser)
+		users.POST("/auth/login", userController.LoginUser)
 	}
 }
