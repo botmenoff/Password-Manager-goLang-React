@@ -18,6 +18,7 @@ type User struct {
 	Password string `json:"-" binding:"required,min=8,max=64"`
 	Username string `json:"username" binding:"required,min=3,max=32"`
 	Icon     string `json:"icon" binding:"omitempty,max=256"`
+	Admin    bool   `json:"admin" binding:"omitempty"`
 }
 
 func (m *UserModel) Insert(user *User) error {

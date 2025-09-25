@@ -196,7 +196,32 @@ func main() {
 # API Rest + Gin
 ## Controllers
 
+
 ## Routes
+
+
+## Middlewares
+En los middlewares hay que tener en cuenta que en Gin podemos guardar valores o objetos en el contexto en el middleware y luego pasarselos al controller de la siguiente maners
+```Go
+func ValidateRegisterRequest() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req models.RegisterRequestModel
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   "Invalid request",
+				"details": err.Error(),
+			})
+			c.Abort()
+			return
+		}
+		// Guardar la request validada en el contexto para el controller
+		c.Set("registerRequest", req)
+
+		c.Next()
+	}
+}
+```
 
 ## Models
 Los campos de los modelos siempre tiene que empezar por mayúscula para ser exportados y accesibles desde otros paquetes. Se usa el json: para indicar como **serializar**  este campo al convertirse de struct a JSON
