@@ -11,8 +11,8 @@ func UserRoutes(rg *gin.RouterGroup, db *sql.DB) {
 	users := rg.Group("/users")
 	userController := controllers.UserController{DB: db}
 	{
-		users.GET("/", controllers.GetAllUsers)
-		users.POST("/auth/register", userController.CreateUser)
+		users.GET("/", userController.GetAllUsers)
+		users.POST("/auth/register", userController.RegisterUser)
 		users.POST("/auth/login", userController.LoginUser)
 	}
 }
