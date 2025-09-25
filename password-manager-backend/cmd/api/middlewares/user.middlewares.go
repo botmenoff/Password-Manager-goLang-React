@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 	"password-manager-backend/cmd/api/models"
 
@@ -56,25 +57,72 @@ func ValidateAdmin() gin.HandlerFunc {
 	}
 }
 
-func IsLogged() gin.HandlerFunc {
+func IsLogged(userModel *models.UserModel) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Obtener el header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Falta token"})
 			c.Abort()
 			return
 		}
 
+		// Validar token y obtener email
 		email, err := models.ValidarToken(authHeader)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
-		// Token válido, continuar
-		c.Set("userEmail", email)
-		c.Next()
 
+		// Buscar usuario
+		user, err := userModel.GetUserFromEmail(email)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no encontrado"})
+			c.Abort()
+			return
+		}
+
+		// Guardar en contexto
+		c.Set("userID", user.Id)
+		c.Set("isAdmin", user.Admin)
+
+		c.Next()
+	}
+}
+
+func CanSeePassword(userModel *models.UserModel) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Obtener token
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Falta token"})
+			c.Abort()
+			return
+		}
+
+		// Validar token y obtener email
+		email, err := models.ValidarToken(authHeader)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		// Buscar usuario por email
+		user, err := userModel.GetUserFromEmail(email)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no encontrado"})
+			c.Abort()
+			return
+		}
+
+		// Guardar en contexto si puede ver la contraseña
+		paramID := c.Param("id")
+		if user.Admin || paramID == fmt.Sprintf("%d", user.Id) {
+			c.Set("canSeePassword", true)
+		} else {
+			c.Set("canSeePassword", false)
+		}
+		c.Next()
 	}
 }
