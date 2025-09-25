@@ -48,7 +48,7 @@ export async function getMe(): Promise<User> {
 
   const res = await fetch(`${API_BASE}/users/me`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: token,
     },
   });
 
