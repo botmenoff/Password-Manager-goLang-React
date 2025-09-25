@@ -21,12 +21,8 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 }
 
 func (uc *UserController) RegisterUser(c *gin.Context) {
-	var register models.RegisterRequest
-	// TODO Sustituir esta validación por un middleaware
-	if err := c.ShouldBindJSON(&register); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-		return
-	}
+	req, _ := c.Get("registerRequest")       // Es una funcion de clave valor en el contexto y simplemente la obtenemos
+	register := req.(models.RegisterRequest) // Lo convertimos al tipo de dato que querremos
 	// Hashear password
 	hashedPassword, err := services.HashPassword(register.Password)
 	if err != nil {
@@ -42,8 +38,10 @@ func (uc *UserController) RegisterUser(c *gin.Context) {
 		Username: register.Username,
 		Icon:     icon,
 	}
-	err = userModel.Insert(&user)
-	if err != nil {
+	// Crear UserModel usando la conexión de la DB
+	userModel := models.UserModel{DB: uc.DB} // .DB() devuelve *sql.DB
+
+	if err := userModel.Insert(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error inserting user: " + err.Error()})
 		return
 	}
