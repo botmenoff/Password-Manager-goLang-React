@@ -31,35 +31,46 @@ type LoginRequest struct {
 // Claims define el contenido del JWT
 type Claims struct {
 	Email string `json:"email"`
+	Admin bool   `json:"admin"`
 	jwt.RegisteredClaims
 }
 
 var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 // GenerarToken crea un token con el email
-func GenerarToken(email string) (string, error) {
+func GenerarToken(email string, isAdmin bool) (string, error) {
 	claims := &Claims{
 		Email: email,
+		Admin: isAdmin,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)), // expira en 1h
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "mi-app",
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
+
 }
 
 func ValidarToken(tokenStr string) (string, error) {
 	claims := &Claims{}
-
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
-
 	if err != nil || !token.Valid {
 		return "", fmt.Errorf("token inválido: %v", err)
 	}
-
 	return claims.Email, nil
+}
+
+func DecodificarToken(tokenStr string) (*Claims, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("token inválido: %v", err)
+	}
+	return claims, nil
 }

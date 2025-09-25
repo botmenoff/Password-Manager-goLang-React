@@ -14,8 +14,6 @@ type UserController struct {
 	DB *sql.DB
 }
 
-var userModel models.UserModel
-
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "List of users"})
 }
@@ -80,7 +78,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		return
 	}
 	// Crear el Token
-	token, err := models.GenerarToken(user.Email)
+	token, err := models.GenerarToken(user.Email, user.Admin)
 	if err != nil {
 		// Si hay error al generar el token
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo generar el token"})

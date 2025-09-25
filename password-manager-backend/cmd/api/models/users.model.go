@@ -46,9 +46,9 @@ func (m *UserModel) GetUserFromEmail(email string) (*User, error) { // Devolver 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel() // Es buena practica usar el cancel cuando se usa WithTimeout
 
-	query := "SELECT id, username, email, icon, password FROM users WHERE email = ?"
+	query := "SELECT id, username, email, icon, password, admin FROM users WHERE email = ?"
 	user := &User{} // Puntero a un usuario
-	err := m.DB.QueryRowContext(ctx, query, email).Scan(&user.Id, &user.Username, &user.Email, &user.Icon, &user.Password)
+	err := m.DB.QueryRowContext(ctx, query, email).Scan(&user.Id, &user.Username, &user.Email, &user.Icon, &user.Password, &user.Admin)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
