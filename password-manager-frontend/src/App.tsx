@@ -3,12 +3,15 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import theme from "./Constants";
 import AuthPanel from "./components/AuthPanel";
 import UserPage from "./pages/UserPage"; // Tu componente para usuarios logueados
+import Navbar from "./components/NavBar";
+import { cookieService } from "./services/cookie.service"
+
 
 const App: React.FC = () => {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = cookieService.getToken();
     setHasToken(!!token); // true si hay token, false si no
   }, []);
 
@@ -20,7 +23,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Normaliza estilos y aplica background */}
-      {hasToken ? <UserPage /> : <AuthPanel />}
+      {hasToken ? <> <Navbar/> <UserPage /></> : <AuthPanel />}
     </ThemeProvider>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
-import { loginUser } from "../services/api.services";
+import { loginUser } from "../services/api.service";
 import type { LoginRequest } from "../models/LoginRequest.models";
+import { cookieService } from "../services/cookie.service"
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -17,11 +18,11 @@ const Login: React.FC = () => {
             const requestData: LoginRequest = { email, password };
             const data = await loginUser(requestData);
 
-            // Guardar token en localStorage para desarrollo rápido
-            localStorage.setItem("token", data.token);
-
+            cookieService.setToken(data.token);
+            cookieService.setUser(data.user);
             // Aquí podrías redirigir al dashboard
             console.log("Login exitoso", data);
+            window.location.reload()
         } catch (err: unknown) {
             // Type guard
             if (err instanceof Error) {

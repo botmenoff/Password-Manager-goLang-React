@@ -4,6 +4,7 @@ import type { LoginResponse } from "../models/LoginRequest.models";
 import type { RegisterRequest } from "../models/RegisterRequest.model";
 import type { RegisterResponse } from "../models/RegisterRequest.model";
 import type { User } from "../models/User.model";
+import { cookieService } from "./cookie.service";
 
 const API_BASE = "http://localhost:8080/api/v1";
 
@@ -43,7 +44,7 @@ export async function registerUser(data: RegisterRequest): Promise<RegisterRespo
 }
 
 export async function getMe(): Promise<User> {
-  const token = localStorage.getItem("token");
+  const token = cookieService.getToken()
   if (!token) throw new Error("No token found");
 
   const res = await fetch(`${API_BASE}/users/me`, {

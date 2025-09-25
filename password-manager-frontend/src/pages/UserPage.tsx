@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Avatar, CircularProgress, Button } from "@mui/material";
-import { getMe } from "../services/api.services";
+import { getMe } from "../services/api.service";
 import type { User } from "../models/User.model";
+import { cookieService } from "../services/cookie.service";
 
 const UserPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -25,7 +26,7 @@ const UserPage: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    cookieService.clearAuth()
     window.location.reload(); // Fuerza volver al AuthPanel
   };
 
@@ -49,6 +50,7 @@ const UserPage: React.FC = () => {
       <Typography variant="body2" color="textSecondary">
         {user.admin ? "Admin" : "Usuario normal"}
       </Typography>
+      <Typography variant="body1">{user.password}</Typography>
 
       <Button
         variant="contained"

@@ -107,7 +107,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo generar el token"})
 		return
 	}
-
+	user.Password = ""
 	c.JSON(http.StatusAccepted, gin.H{
 		"user":  user,
 		"token": token,
