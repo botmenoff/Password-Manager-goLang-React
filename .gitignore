@@ -1,1 +1,34 @@
-./password-manager-obsidian-notes/.obsidian/workspace.json
+# ==============================
+# React frontend
+# ==============================
+# Node modules
+password-manager-frontend/node_modules/
+# Build output
+password-manager-frontend/build/
+password-manager-frontend/dist/
+# Logs
+password-manager-frontend/npm-debug.log*
+password-manager-frontend/yarn-debug.log*
+password-manager-frontend/yarn-error.log*
+password-manager-frontend/pnpm-debug.log*
+# Dependency directories
+password-manager-frontend/.pnp/
+password-manager-frontend/.pnp.js
+# Environment variables
+password-manager-frontend/.env
+password-manager-frontend/.env.local
+password-manager-frontend/.env.development.local
+password-manager-frontend/.env.test.local
+password-manager-frontend/.env.production.local
+# Editor directories
+password-manager-frontend/.idea/
+password-manager-frontend/.vscode/
+
+# ==============================
+# Obsidian notes
+# ==============================
+# Workspace and cache files
+password-manager-obsidian-notes/.obsidian/workspace.json
+password-manager-obsidian-notes/.obsidian/cache/
+# Backup vault files (si los hay)
+password-manager-obsidian-notes/.obsidian/backup/#
