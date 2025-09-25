@@ -15,6 +15,15 @@ type UserController struct {
 	DB *sql.DB
 }
 
+// GetAllUsers godoc
+// @Summary Obtener todos los usuarios
+// @Description Devuelve la lista de usuarios, ocultando la contraseña si no eres admin ni el propio usuario
+// @Tags users
+// @Produce json
+// @Success 200 {array} models.User
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /users [get]
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	userModel := models.UserModel{DB: uc.DB}
 
@@ -41,6 +50,17 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, safeUsers)
 }
 
+// RegisterUser godoc
+// @Summary Registrar un nuevo usuario
+// @Description Registra un usuario nuevo, hashea la contraseña y asigna un avatar
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param register body models.RegisterRequest true "Datos del usuario"
+// @Success 201 {object} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/register [post]
 func (uc *UserController) RegisterUser(c *gin.Context) {
 	req, _ := c.Get("registerRequest")       // Es una funcion de clave valor en el contexto y simplemente la obtenemos
 	register := req.(models.RegisterRequest) // Lo convertimos al tipo de dato que querremos
@@ -70,6 +90,17 @@ func (uc *UserController) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
+// LoginUser godoc
+// @Summary Login de usuario
+// @Description Inicia sesión y devuelve token JWT
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param login body models.LoginRequest true "Datos de login"
+// @Success 202 {object} map[string]interface{}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/login [post]
 func (uc *UserController) LoginUser(c *gin.Context) {
 	var body models.LoginRequest
 	// Validar que se ha mandado correctamente en el body
@@ -114,6 +145,18 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	})
 }
 
+// GetUserByID godoc
+// @Summary Obtener usuario por ID
+// @Description Devuelve un usuario por su ID, oculta la contraseña si no tiene permisos
+// @Tags users
+// @Produce json
+// @Param id path int true "ID del usuario"
+// @Success 200 {object} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /users/{id} [get]
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -141,6 +184,17 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// GetMe godoc
+// @Summary Obtener mi información
+// @Description Devuelve la información del usuario logueado, incluyendo la contraseña
+// @Tags users
+// @Produce json
+// @Success 200 {object} models.User
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /users/me [get]
 func (uc *UserController) GetMe(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -161,6 +215,5 @@ func (uc *UserController) GetMe(c *gin.Context) {
 		return
 	}
 
-	// ⚠️ aquí sí devolvemos la contraseña, porque es el dueño
 	c.JSON(http.StatusOK, user)
 }
