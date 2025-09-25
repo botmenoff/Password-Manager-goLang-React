@@ -5,6 +5,7 @@ https://go.dev/tour/moretypes/8
 https://github.com/Melkeydev/go-blueprint
 https://www.youtube.com/watch?v=ERZadn9artM&t=1994s
 https://pkg.go.dev/github.com/golang-jwt/jwt/v5
+https://mui.com/material-ui/getting-started/installation/
 
 
 docker exec -it password-manager-backend-mysql_bp-1 mysql -uroot -p
