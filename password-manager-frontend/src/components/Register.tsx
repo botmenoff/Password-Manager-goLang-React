@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
-import { registerUser } from "../services/api.services"; // tu servicio
+import { registerUser } from "../services/api.service"; // tu servicio
 import type { RegisterRequest } from "../models/RegisterRequest.model";
 
 const Register: React.FC = () => {
@@ -8,19 +8,24 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null); // ✅ Estado de éxito
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null); // resetear mensaje de éxito al enviar
 
     try {
       const requestData: RegisterRequest = { email, username, password };
       const data = await registerUser(requestData);
 
       console.log("Registro exitoso", data);
-      // Aquí podrías redirigir al login o dashboard
+      setSuccess("¡Registrado correctamente!"); // mensaje de éxito
+      setEmail("");
+      setUsername("");
+      setPassword("");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -46,7 +51,8 @@ const Register: React.FC = () => {
         Registro
       </Typography>
 
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>} {/* ✅ Mensaje verde */}
 
       <Box component="form" onSubmit={handleSubmit} width="100%" maxWidth={400}>
         <TextField

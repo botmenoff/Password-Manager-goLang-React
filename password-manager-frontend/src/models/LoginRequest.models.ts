@@ -1,3 +1,5 @@
+import type { User } from "./User.model";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -5,5 +7,5 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
-  userId?: number; // si tu backend lo devuelve
+  user: User
 }
