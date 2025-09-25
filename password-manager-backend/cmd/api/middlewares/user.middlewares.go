@@ -54,5 +54,27 @@ func ValidateAdmin() gin.HandlerFunc {
 		c.Set("userClaims", claims)
 		c.Next()
 	}
+}
 
+func IsLogged() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Obtener el header
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing"})
+			c.Abort()
+			return
+		}
+
+		email, err := models.ValidarToken(authHeader)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+		// Token válido, continuar
+		c.Set("userEmail", email)
+		c.Next()
+
+	}
 }
