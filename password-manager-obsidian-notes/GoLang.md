@@ -15,6 +15,21 @@
     - Networking, concurrencia, JSON, servidores HTTP y más, todo nativo.
     - Menos necesidad de frameworks pesados o dependencias externas.
 
+# Tipos basicos
+bool
+string
+int  int8  int16  int32  int64
+uint uint8 uint16 uint32 uint64 uintptr
+byte // alias for uint8
+rune // alias for int32
+     // represents a Unicode code point
+float32 float64
+complex64 complex128
+## Valores iniciales
+- `0` for numeric types,
+- `false` for the boolean type, and
+- `""` (the empty string) for strings.
+
 # Sintaxis/Propiedades propia de Go
 
 ## Sintaxis
@@ -127,8 +142,17 @@ fmt.Println(sub)
 ```
 
 ### Packages
+Loa packages son una unidad básica ed organicación en Go, define un espacio de nombres para el código que contiene
+```Go
+// archivo: mathutils/add.go
+package mathutils
 
-## GoRoutines
+func Add(a int, b int) int {
+    return a + b
+}
+```
+
+### GoRoutines
 
 ### Defer
 El defer se usa para retrasar la ejecución de una línea de código y es útil para cerrar conexiones y cosas similares.
@@ -150,7 +174,7 @@ fmt.Println("Valor apuntado por p:", *p) // desreferenciamos
 fmt.Println("x tras modificar vía p:", x)
 ```
 
-## Structs
+### Structs
 No tienen nada de especial ni diferentes pero es para tener un ejemplo basico con punteros
 ```Go
 type Vertex struct {
@@ -168,20 +192,6 @@ func main() {
 	fmt.Println(v1, p, v2, v3)
 }
 ```
-# Tipos basicos
-bool
-string
-int  int8  int16  int32  int64
-uint uint8 uint16 uint32 uint64 uintptr
-byte // alias for uint8
-rune // alias for int32
-     // represents a Unicode code point
-float32 float64
-complex64 complex128
-## Valores iniciales
-- `0` for numeric types,
-- `false` for the boolean type, and
-- `""` (the empty string) for strings.
 
 # API Rest + Gin
 ## Controllers
@@ -206,6 +216,83 @@ type User struct {
 	Username string `json:"username"`
 	Icon     string `json:"icon"`
 }
+```
+## JWT
+En el jwt tenemos lo que se llaman los Claims que va "dentro" del jwt (el payload)
+Existen 2 tipos :
+- Registred Claims → son estándar de JWT (exp, iat, iss, sub, etc.).
+- **Custom claims** → los que definimos nosotros (ejemplo: `Email`, `Role`, etc.). En este caso usare un custom Claim para luego poder encontrar el usuario buscando por emial
+```Go
+// Para hacer un custom claim primero tenemos que definir un nuevo struct
+type Claims struct {
+	Email string `json:"email"`        // claim personalizado con el email
+	jwt.RegisteredClaims               // incluye los estándar de JWT
+}
+var jwtKey = []byte(os.Getenv("JWT_SECRET")) // Secret que usamos para generar el JWT
+Esto significa que cuando generamos el token, tendrá:
+- `email`: el correo del usuario.
+- `exp`: fecha de expiración.
+- `iat`: fecha de emisión.
+- `iss`: quién emitió el token.
+```
+Y ahora necesitamos crear funciones para Generar el Token y para Validar este token
+```Go
+// GENERAR
+func GenerarToken(email string) (string, error) {
+	claims := &Claims{
+		Email: email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)), // expira en 1h
+			IssuedAt:  jwt.NewNumericDate(time.Now()),                   // emitido ahora
+			Issuer:    "mi-app",                                         // identificador del emisor
+		},
+	}
+
+	// Crear el token con algoritmo HS256 (HMAC + clave secreta)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// Firmar el token con nuestra clave secreta
+	return token.SignedString(jwtKey)
+}
+
+// VALIDAR
+func ValidarToken(tokenStr string) (string, error) {
+	claims := &Claims{}
+	// Parsear y validar el token
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil // usamos la misma clave secreta
+	})
+	if err != nil || !token.Valid {
+		return "", fmt.Errorf("token inválido: %v", err)
+	}
+	return claims.Email, nil
+}
+
+```
+
+## Bcrypt
+Es bastante similar a como funciona en node o en otros frameworks que ya he usado por lo que no voy a poner mucha explicación
+```Go
+package services
+
+import (
+	"golang.org/x/crypto/bcrypt"
+)
+
+// HashPassword recibe una contraseña en texto plano y devuelve su hash
+func HashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashed), nil
+}
+
+// CheckPassword compara la contraseña en texto plano con el hash
+func CheckPassword(password, hashed string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+	return err == nil
+}
+
 ```
 
 # Comandos de Go
