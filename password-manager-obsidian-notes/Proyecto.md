@@ -99,3 +99,8 @@ e.Start(":8080")
 ## Razonamiento de la elección
 
 He decidido usar `Gin` como mi framework para el backend porque es uno de los mas populares y usados, tiene una sintaxis sencilla y utilidades ya hechas como JSON, validación, middleware, logging. También es escalable por lo que lo probablemente es uno de los candidatos a usar en el proyecto de la empresa. Estaba entre este `Gin` y `Fiber` ya que vengo de Node.js y me seria facil adaptarme en la sintaxis de este framework pero he decidido entrar de lleno en el ecosistema de Go para asi familiarizarme con este lenguaje y su entorno.
+
+# Diseño de la BBDD
+Base de datos muy basica para hacer un CRUD de usuarios y notas con relacion N<-1
+![[Pasted image 20250923185049.png]]
+

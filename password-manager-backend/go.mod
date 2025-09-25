@@ -11,6 +11,7 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/mysql v0.39.0
 )
 
+require github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
