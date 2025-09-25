@@ -59,7 +59,7 @@ func ValidarToken(tokenStr string) (string, error) {
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
-		return "", fmt.Errorf("token inválido: %v", err)
+		return "", fmt.Errorf("Invalid token: %v", err)
 	}
 	return claims.Email, nil
 }
@@ -70,7 +70,7 @@ func DecodificarToken(tokenStr string) (*Claims, error) {
 		return jwtKey, nil
 	})
 	if err != nil || !token.Valid {
-		return nil, fmt.Errorf("token inválido: %v", err)
+		return nil, fmt.Errorf("Invalid token: %v", err)
 	}
 	return claims, nil
 }
