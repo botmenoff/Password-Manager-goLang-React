@@ -82,3 +82,40 @@ export async function updateUser(id: number, data: Partial<User>): Promise<{ mes
 
   return res.json();
 }
+
+export async function getAllUsers(): Promise<User[]> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/users/`, {
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error fetching user data");
+  }
+
+  return res.json(); // ahora será User[]
+}
+
+
+export async function deleteUser(id: number): Promise<void> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error eliminando usuario");
+  }
+}
+
