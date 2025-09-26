@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
-import { registerUser } from "../services/api.service"; // tu servicio
+import { registerUser } from "../services/api.service";
 import type { RegisterRequest } from "../models/RegisterRequest.model";
 
 const Register: React.FC = () => {
@@ -8,21 +8,21 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null); // ✅ Estado de éxito
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null); // resetear mensaje de éxito al enviar
+    setSuccess(null);
 
     try {
       const requestData: RegisterRequest = { email, username, password };
       const data = await registerUser(requestData);
 
       console.log("Registro exitoso", data);
-      setSuccess("¡Registrado correctamente!"); // mensaje de éxito
+      setSuccess("¡Registrado correctamente!");
       setEmail("");
       setUsername("");
       setPassword("");
@@ -45,14 +45,14 @@ const Register: React.FC = () => {
       justifyContent="center"
       minHeight="50vh"
       px={2}
-      sx={{ backgroundColor: "#ffffff" }} // fondo blanco
+      sx={{ backgroundColor: "#ffffff" }}
     >
       <Typography variant="h4" mb={3}>
         Registro
       </Typography>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>} {/* ✅ Mensaje verde */}
+      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
       <Box component="form" onSubmit={handleSubmit} width="100%" maxWidth={400}>
         <TextField

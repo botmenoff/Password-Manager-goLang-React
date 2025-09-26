@@ -30,6 +30,7 @@ const Navbar: React.FC = () => {
           <Tab label="Usuarios" value="/users" />
           <Tab label="Login" value="/login" />
           <Tab label="Apuntes Go" value="/ObsidianNotesDisplay" />
+          <Tab label="API Docs" value="/ApiDocs" />
         </Tabs>
       </Toolbar>
     </AppBar>
