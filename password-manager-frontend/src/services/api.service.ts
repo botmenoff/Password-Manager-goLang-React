@@ -60,3 +60,25 @@ export async function getMe(): Promise<User> {
 
   return res.json();
 }
+
+
+export async function updateUser(id: number, data: Partial<User>): Promise<{ message: string }> {
+  const token = cookieService.getToken()
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/users/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al actualizar usuario");
+  }
+
+  return res.json();
+}

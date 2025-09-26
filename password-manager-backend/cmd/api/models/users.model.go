@@ -12,6 +12,11 @@ type UserModel struct {
 	DB *sql.DB
 }
 
+type UpdateUserRequest struct {
+	Userame string `json:"username"`
+	Email   string `json:"email"`
+}
+
 type User struct {
 	Id       int    `json:"id"`
 	Email    string `json:"email" binding:"required,email"`
@@ -96,4 +101,19 @@ func (m *UserModel) GetAll() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (um *UserModel) UpdateUserByID(id int, req UpdateUserRequest) error {
+	_, err := um.DB.Exec(`
+		UPDATE users 
+		SET username = ?, email = ? 
+		WHERE id = ?`,
+		req.Userame, req.Email, id,
+	)
+	return err
+}
+
+func (um *UserModel) DeleteUserByID(id int) error {
+	_, err := um.DB.Exec(`DELETE FROM users WHERE id = ?`, id)
+	return err
 }

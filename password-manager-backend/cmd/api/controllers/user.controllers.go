@@ -217,3 +217,76 @@ func (uc *UserController) GetMe(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+func (uc *UserController) UpdateUser(c *gin.Context) {
+	// Verificar permisos desde el middleware
+	canSee, exists := c.Get("canSeePassword")
+	if !exists || canSee.(bool) == false {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "No tienes permisos para actualizar este usuario",
+		})
+		return
+	}
+
+	// Obtener ID desde la URL
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	// Parsear body
+	var req models.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Usar el modelo
+	userModel := models.UserModel{DB: uc.DB}
+	err = userModel.UpdateUserByID(id, req)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Usuario actualizado correctamente"})
+}
+
+func (uc *UserController) DeleteUser(c *gin.Context) {
+	// Verificar permisos desde el middleware
+	canSee, exists := c.Get("canSeePassword")
+	if !exists || canSee.(bool) == false {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "No tienes permisos para eliminar este usuario",
+		})
+		return
+	}
+
+	// Obtener ID desde la URL
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	// Usar el modelo
+	userModel := models.UserModel{DB: uc.DB}
+	err = userModel.DeleteUserByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Usuario eliminado correctamente"})
+}
