@@ -9,6 +9,7 @@ import Navbar from "./components/NavBar";
 import ObsidianNotesDisplay from "./pages/ObsidianNotesDisplay";
 import { cookieService } from "./services/cookie.service";
 import SwaggerPage from "./pages/SwaggerPage";
+import AdminPage from "./pages/AdminPage";
 
 const App: React.FC = () => {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
@@ -38,6 +39,7 @@ const App: React.FC = () => {
             <Route path="/ObsidianNotesDisplay" element={<ObsidianNotesDisplay />} />
             <Route path="/user" element={<UserPage />} /> {/* Tu página de usuario logueado */}
             <Route path="/ApiDocs" element={<SwaggerPage />} />
+            <Route path="/users" element={<AdminPage />} />
           </Routes>
         </>
       ) : (

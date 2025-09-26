@@ -20,6 +20,6 @@ func UserRoutes(rg *gin.RouterGroup, db *sql.DB) {
 		users.GET("/:id", middlewares.IsLogged(&userModel), middlewares.CanSeePassword(&userModel), userController.GetUserByID)
 		users.GET("/me", middlewares.IsLogged(&userModel), userController.GetMe)
 		users.PUT("/:id", middlewares.IsLogged(&userModel), middlewares.CanSeePassword(&userModel), userController.UpdateUser)
-
+		users.DELETE("/:id", middlewares.IsLogged(&userModel), middlewares.CanSeePassword(&userModel), userController.DeleteUser)
 	}
 }

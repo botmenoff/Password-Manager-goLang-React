@@ -1,15 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AppBar, Tabs, Tab, Toolbar } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getMe } from "../services/api.service"; // para saber si es admin
+import type { User } from "../models/User.model";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Mapea rutas a valores válidos para Tabs
-  const validTabs = ["/", "/profile", "/users", "/login", "/ObsidianNotesDisplay"];
+  const [user, setUser] = useState<User | null>(null);
 
-  // Si la ruta actual no coincide, marcar Home por defecto
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const me = await getMe();
+        setUser(me);
+      } catch {
+        setUser(null); // si no está logueado o hay error
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Rutas válidas
+  const validTabs = ["/", "/profile", "/login", "/ObsidianNotesDisplay", "/ApiDocs"];
+  if (user?.admin) {
+    validTabs.push("/users"); // solo si es admin
+  }
+
   const currentTab = validTabs.includes(location.pathname) ? location.pathname : "/";
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -27,7 +46,7 @@ const Navbar: React.FC = () => {
         >
           <Tab label="Home" value="/" />
           <Tab label="Perfil" value="/profile" />
-          <Tab label="Usuarios" value="/users" />
+          {user?.admin && <Tab label="users" value="/users" />}
           <Tab label="Login" value="/login" />
           <Tab label="Apuntes Go" value="/ObsidianNotesDisplay" />
           <Tab label="API Docs" value="/ApiDocs" />
