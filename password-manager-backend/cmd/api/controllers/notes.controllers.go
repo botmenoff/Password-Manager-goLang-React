@@ -239,3 +239,77 @@ func (nc *NotesController) DeleteNote(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Nota eliminada correctamente"})
 }
+
+// GetNotesByUserID godoc
+// @Summary Obtener notas de un usuario específico
+// @Description Devuelve todas las notas de un usuario dado
+// @Tags notes
+// @Produce json
+// @Param user_id path int true "ID del usuario"
+// @Success 200 {array} models.Notes
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /notes/user/{user_id} [get]
+func (nc *NotesController) GetNotesByUserID(c *gin.Context) {
+	userIDParam := c.Param("id")
+	userID, err := strconv.Atoi(userIDParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de usuario inválido"})
+		return
+	}
+
+	notesModel := models.NotesModel{DB: nc.DB}
+	notes, err := notesModel.GetByUserID(userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No se encontraron notas para este usuario"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, notes)
+}
+
+// SearchNotes godoc
+// @Summary Buscar notas por texto
+// @Description Devuelve todas las notas que contengan el texto buscado
+// @Tags notes
+// @Produce json
+// @Param q query string true "Texto a buscar"
+// @Success 200 {array} models.Notes
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /notes/search [get]
+func (nc *NotesController) SearchNotes(c *gin.Context) {
+	query := c.Query("q")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Se requiere un texto de búsqueda"})
+		return
+	}
+
+	user, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "No autorizado"})
+		return
+	}
+
+	userID := user.(int) // ✅ ahora es un int
+
+	notesModel := models.NotesModel{DB: nc.DB}
+	notes, err := notesModel.SearchByText(userID, query)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No se encontraron notas"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, notes)
+}

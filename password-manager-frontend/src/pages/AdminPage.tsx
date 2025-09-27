@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { getAllUsers, deleteUser, updateUser } from "../services/api.service";
 import type { User } from "../models/User.model";
+import UserNotesDialog from "../components/UserNotesDialog";
 
 const AdminPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -30,6 +31,10 @@ const AdminPage: React.FC = () => {
   // Para eliminar
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  // Para notas
+  const [openNotesDialog, setOpenNotesDialog] = useState<boolean>(false);
+  const [notesUserId, setNotesUserId] = useState<number | null>(null);
 
   // Para editar
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
@@ -81,6 +86,17 @@ const AdminPage: React.FC = () => {
     } finally {
       handleCloseDialog();
     }
+  };
+
+  // Mostrar notas
+  const handleOpenNotesDialog = (userId: number): void => {
+    setNotesUserId(userId);
+    setOpenNotesDialog(true);
+  };
+
+  const handleCloseNotesDialog = (): void => {
+    setNotesUserId(null);
+    setOpenNotesDialog(false);
   };
 
   // Editar usuario
@@ -181,9 +197,17 @@ const AdminPage: React.FC = () => {
                   <Button
                     variant="contained"
                     color="error"
+                    sx={{ mr: 1 }}
                     onClick={() => handleOpenDialog(Number(user.id))}
                   >
                     Eliminar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleOpenNotesDialog(Number(user.id))}
+                  >
+                    Ver Notas
                   </Button>
                 </TableCell>
               </TableRow>
@@ -237,6 +261,15 @@ const AdminPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog de notas del usuario */}
+      {notesUserId !== null && (
+        <UserNotesDialog
+          userId={notesUserId}
+          open={openNotesDialog}
+          onClose={handleCloseNotesDialog}
+        />
+      )}
     </Box>
   );
 };

@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
 )
 
 type NotesModel struct {
@@ -11,10 +10,10 @@ type NotesModel struct {
 }
 
 type Notes struct {
-	Id        int       `json:"id"`
-	UserId    int       `json:"user_id"`
-	NoteText  string    `json:"note_text" binding:"required,min=3,max=255"`
-	CreatedAt time.Time `json:"created_at"`
+	Id        int    `json:"id"`
+	UserId    int    `json:"user_id"`
+	NoteText  string `json:"note_text" binding:"required,min=3,max=255"`
+	CreatedAt string `json:"created_at"`
 }
 
 // GetAll obtiene todas las notas
@@ -132,4 +131,26 @@ func (m *NotesModel) GetByID(id int) (*Notes, error) {
 		return nil, err
 	}
 	return &n, nil
+}
+
+func (nm *NotesModel) SearchByText(userID int, text string) ([]Notes, error) {
+	query := `SELECT id, note_text, user_id, created_at 
+	          FROM notes 
+	          WHERE user_id = ? AND note_text LIKE ? 
+	          ORDER BY created_at DESC`
+	rows, err := nm.DB.Query(query, userID, "%"+text+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var notes []Notes
+	for rows.Next() {
+		var note Notes
+		if err := rows.Scan(&note.Id, &note.NoteText, &note.UserId, &note.CreatedAt); err != nil {
+			return nil, err
+		}
+		notes = append(notes, note)
+	}
+	return notes, nil
 }

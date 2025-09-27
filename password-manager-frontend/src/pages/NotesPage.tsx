@@ -20,18 +20,22 @@ import {
     createNote,
     updateNote,
     deleteNote,
+    searchNotes,
 } from "../services/api.service";
 
 const NotesPage: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Para crear/editar notas
+    // Búsqueda
+    const [search, setSearch] = useState("");
+
+    // Crear/editar notas
     const [open, setOpen] = useState(false);
     const [editingNote, setEditingNote] = useState<Note | null>(null);
     const [noteText, setNoteText] = useState("");
 
-    // Para eliminar notas con confirmación
+    // Eliminar notas
     const [openDialog, setOpenDialog] = useState(false);
     const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
 
@@ -39,6 +43,22 @@ const NotesPage: React.FC = () => {
         try {
             setLoading(true);
             const data = await getMyNotes();
+            setNotes(data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = async (query: string) => {
+        if (!query.trim()) {
+            fetchNotes();
+            return;
+        }
+        try {
+            setLoading(true);
+            const data = await searchNotes(query);
             setNotes(data);
         } catch (err) {
             console.error(err);
@@ -72,7 +92,6 @@ const NotesPage: React.FC = () => {
         if (noteToDelete !== null) {
             try {
                 await deleteNote(noteToDelete);
-
                 setNotes((prevNotes) =>
                     prevNotes.filter((note) => note.id !== noteToDelete)
                 );
@@ -84,7 +103,6 @@ const NotesPage: React.FC = () => {
             }
         }
     };
-
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -103,6 +121,20 @@ const NotesPage: React.FC = () => {
         setOpen(true);
     };
 
+    // 🔹 Debounce para búsqueda en vivo
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (search.trim()) {
+                handleSearch(search);
+            } else {
+                fetchNotes();
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [search]);
+
+
     useEffect(() => {
         fetchNotes();
     }, []);
@@ -112,14 +144,26 @@ const NotesPage: React.FC = () => {
             <Typography variant="h5" gutterBottom>
                 Mis Notas
             </Typography>
-            <Button variant="contained" color="primary" onClick={handleCreate}>
-                Nueva Nota
-            </Button>
+
+            {/* Barra de búsqueda */}
+            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                <TextField
+                    label="Buscar nota"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <Button variant="contained" color="primary" onClick={handleCreate}>
+                    Nueva Nota
+                </Button>
+            </Box>
 
             {loading ? (
                 <Typography sx={{ mt: 2 }}>Cargando...</Typography>
             ) : (
-                <Table sx={{ mt: 2 }}>
+                <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "#1976D2" }}>
                             <TableCell sx={{ color: "white" }}>ID</TableCell>
@@ -135,14 +179,16 @@ const NotesPage: React.FC = () => {
                             <TableRow key={note.id}>
                                 <TableCell>{note.id}</TableCell>
                                 <TableCell>{note.note_text}</TableCell>
-                                <TableCell>  {new Date(note.created_at).toLocaleString()}</TableCell>
+                                <TableCell>
+                                    {new Date(note.created_at).toLocaleString()}
+                                </TableCell>
                                 <TableCell align="right">
                                     <Button
                                         variant="contained"
                                         color="primary"
                                         onClick={() => handleEdit(note)}
                                     >
-                                        Edit
+                                        Editar
                                     </Button>
                                     <Button
                                         variant="contained"
@@ -159,7 +205,7 @@ const NotesPage: React.FC = () => {
                 </Table>
             )}
 
-            {/* Modal Crear/Editar Nota */}
+            {/* Modal Crear/Editar */}
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>{editingNote ? "Editar Nota" : "Nueva Nota"}</DialogTitle>
                 <DialogContent>
@@ -179,7 +225,7 @@ const NotesPage: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Dialog Confirmación de Eliminación */}
+            {/* Confirmación eliminación */}
             <Dialog open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>Confirmar eliminación</DialogTitle>
                 <DialogContent>

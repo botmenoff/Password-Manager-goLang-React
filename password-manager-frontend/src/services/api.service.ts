@@ -19,7 +19,7 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
     credentials: "include", // si usas cookies HttpOnly
   });
   console.log(res);
-  
+
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(errorData.error || "Error en login");
@@ -219,3 +219,36 @@ export async function deleteNote(id: number): Promise<void> {
     throw new Error(err.error || "Error eliminando nota");
   }
 }
+
+// Obtener todas las notas de un usuario por su ID
+export async function getNotesByUserId(userId: number): Promise<Note[]> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/user/${userId}`, {
+    headers: {
+      Authorization: token,
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error obteniendo notas del usuario");
+  }
+
+  return res.json();
+}
+
+export const searchNotes = async (query: string) => {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+  const res = await fetch(`/api/notes/search?q=${encodeURIComponent(query)}`, {
+    headers: {
+      Authorization: token,
+    },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Error buscando notas");
+  return res.json();
+};
