@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Tabs, Tab, Toolbar } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getMe } from "../services/api.service"; // para saber si es admin
+import { getMe } from "../services/api.service";
 import type { User } from "../models/User.model";
 
 const Navbar: React.FC = () => {
@@ -16,20 +16,28 @@ const Navbar: React.FC = () => {
         const me = await getMe();
         setUser(me);
       } catch {
-        setUser(null); // si no está logueado o hay error
+        setUser(null);
       }
     };
 
     fetchUser();
   }, []);
 
-  // Rutas válidas
-  const validTabs = ["/", "/profile", "/login", "/ObsidianNotesDisplay", "/ApiDocs"];
+  // 🔹 Rutas visibles en tabs
+  const tabs = [
+    { label: "Notas", path: "/notes" },
+    { label: "Perfil", path: "/profile" },
+    { label: "Apuntes Obsidian", path: "/obsidian" },
+    { label: "API Docs", path: "/apidocs" },
+  ];
+
   if (user?.admin) {
-    validTabs.push("/users"); // solo si es admin
+    tabs.push({ label: "Admin Panel", path: "/admin" });
   }
 
-  const currentTab = validTabs.includes(location.pathname) ? location.pathname : "/";
+  const currentTab = tabs.some((t) => t.path === location.pathname)
+    ? location.pathname
+    : false;
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     navigate(newValue);
@@ -44,12 +52,9 @@ const Navbar: React.FC = () => {
           textColor="inherit"
           indicatorColor="secondary"
         >
-          <Tab label="Home" value="/" />
-          <Tab label="Perfil" value="/profile" />
-          {user?.admin && <Tab label="users" value="/users" />}
-          <Tab label="Login" value="/login" />
-          <Tab label="Apuntes Go" value="/ObsidianNotesDisplay" />
-          <Tab label="API Docs" value="/ApiDocs" />
+          {tabs.map((tab) => (
+            <Tab key={tab.path} label={tab.label} value={tab.path} />
+          ))}
         </Tabs>
       </Toolbar>
     </AppBar>

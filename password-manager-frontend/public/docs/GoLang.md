@@ -153,7 +153,29 @@ func Add(a int, b int) int {
 ```
 
 ### GoRoutines
+Una **goroutine** es una función que se ejecuta de manera **concurrente** con otras funciones.
+Son ligeras: puedes tener **miles de goroutines** funcionando al mismo tiempo.    
+Son la forma principal de manejar **concurrencia** en Go, diferente a hilos de sistema operativo.
+```Go
+package main
 
+import (
+    "fmt"
+    "time"
+)
+
+func sayHello() {
+    fmt.Println("Hola desde Goroutine")
+}
+
+func main() {
+    go sayHello() // <-- se ejecuta de manera concurrente
+
+    // Necesitamos esperar un poco para que termine la goroutine
+    time.Sleep(1 * time.Second)
+    fmt.Println("Main function terminó")
+} // Si no pones `time.Sleep`, la goroutine puede no alcanzar a ejecutarse antes de que termine `main`.
+```
 ### Defer
 El defer se usa para retrasar la ejecución de una línea de código y es útil para cerrar conexiones y cosas similares.
 ```Go
@@ -195,10 +217,29 @@ func main() {
 
 # API Rest + Gin
 ## Controllers
-
-
+**Función o un método que recibe un `Context` de Gin** y responde al cliente.
+```Go
+// Función que actúa como controller
+func GetHello(c *gin.Context) {
+    name := c.Query("name") // leer query param ?name=Go
+    if name == "" {
+        name = "Mundo"
+    }
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Hola " + name,
+    })
+}
+```
 ## Routes
-
+```Go
+userController := controllers.UserController{}
+userRoutes := r.Group("/users")
+{
+    userRoutes.GET("/:id", userController.GetUser)
+    userRoutes.PUT("/:id", userController.UpdateUser)
+    userRoutes.DELETE("/:id", userController.DeleteUser)
+}
+```
 
 ## Middlewares
 En los middlewares hay que tener en cuenta que en Gin podemos guardar valores o objetos en el contexto en el middleware y luego pasarselos al controller de la siguiente maners
@@ -322,7 +363,87 @@ func CheckPassword(password, hashed string) bool {
 
 # Comandos de Go
 ```Shell
-go run rutaArchivo
+# ------------------------------
+# Ejecutar archivos Go directamente
+# Compila y ejecuta el archivo sin generar binario
+go run main.go
+# Ejecuta varios archivos juntos
+go run main.go helpers.go
+
+# ------------------------------
+# Compilar binario
+# El -o especifica el nombre del ejecutable
 go build -o hello_world main.go
-# El -o es para proporcionar nombre al .bin
+# Ejecutar el binario generado
+./hello_world          # Linux / Mac
+hello_world.exe        # Windows
+
+# ------------------------------
+# Inicializar un módulo Go
+# Crea go.mod para manejar dependencias
+go mod init nombreDelModulo
+
+# ------------------------------
+# Descargar y limpiar dependencias
+# Descarga las necesarias y elimina las no usadas
+go mod tidy
+# Instalar una dependencia específica
+go get github.com/gin-gonic/gin@latest
+
+# ------------------------------
+# Ejecutar tests
+# Ejecuta todos los tests de todos los paquetes
+go test ./...
+# Ejecuta tests de un paquete específico
+go test ./controllers
+# Ejecuta tests y muestra detalles
+go test -v ./controllers
+
+# ------------------------------
+# Formatear código
+# Formatea todo el proyecto según las reglas de Go
+go fmt ./...
+# Formatear un archivo específico y escribir cambios
+gofmt -w main.go
+
+# ------------------------------
+# Instalar herramientas
+# Instala ejecutables de Go y los coloca en $GOPATH/bin
+go install github.com/swaggo/swag/cmd/swag@latest
+
+# ------------------------------
+# Mostrar información de dependencias
+# Lista todas las dependencias del proyecto
+go list -m all
+
+# ------------------------------
+# Compilar para otra plataforma (cross-compiling)
+# Por ejemplo, compilar en Windows para Linux AMD64
+GOOS=linux GOARCH=amd64 go build -o app main.go
+
+# ------------------------------
+# Ejecutar con verbose
+# Muestra información detallada de los paquetes que se compilan
+go run -v main.go
+
+# ------------------------------
+# Ver versión de Go instalada
+go version
+
+# ------------------------------
+# Actualizar dependencias
+go get -u ./...
+
+# ------------------------------
+# Ver módulos disponibles
+go list -m -versions nombreModulo
+
+# ------------------------------
+# Limpiar módulos no utilizados
+go mod tidy
+
+# ------------------------------
+# Descargar dependencias sin compilarlas
+go mod download
+
 ```
