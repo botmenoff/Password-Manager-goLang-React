@@ -124,6 +124,7 @@ const NotesPage: React.FC = () => {
                         <TableRow sx={{ backgroundColor: "#1976D2" }}>
                             <TableCell sx={{ color: "white" }}>ID</TableCell>
                             <TableCell sx={{ color: "white" }}>Texto</TableCell>
+                            <TableCell sx={{ color: "white" }}>Creadas en</TableCell>
                             <TableCell sx={{ color: "white" }} align="right">
                                 Acciones
                             </TableCell>
@@ -134,6 +135,7 @@ const NotesPage: React.FC = () => {
                             <TableRow key={note.id}>
                                 <TableCell>{note.id}</TableCell>
                                 <TableCell>{note.note_text}</TableCell>
+                                <TableCell>  {new Date(note.created_at).toLocaleString()}</TableCell>
                                 <TableCell align="right">
                                     <Button
                                         variant="contained"

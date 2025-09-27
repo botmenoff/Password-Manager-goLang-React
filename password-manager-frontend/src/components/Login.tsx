@@ -3,8 +3,10 @@ import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 import { loginUser } from "../services/api.service";
 import type { LoginRequest } from "../models/LoginRequest.models";
 import { cookieService } from "../services/cookie.service"
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,7 @@ const Login: React.FC = () => {
             cookieService.setUser(data.user);
             // Aquí podrías redirigir al dashboard
             console.log("Login exitoso", data);
-            window.location.reload()
+            navigate("/notes", { replace: true });
         } catch (err: unknown) {
             // Type guard
             if (err instanceof Error) {
