@@ -32,6 +32,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		v1.GET("/", s.HelloWorldHandler)
 		v1.GET("/health", s.healthHandler)
 		routes.UserRoutes(v1, s.db.DB())
+		routes.NotesRoutes(v1, s.db.DB())
 	}
 
 	return r

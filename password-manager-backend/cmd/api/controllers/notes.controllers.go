@@ -13,51 +13,28 @@ type NotesController struct {
 	DB *sql.DB
 }
 
-// GetAllNotes godoc
-// @Summary Obtener todas las notas
-// @Description Devuelve todas las notas de todos los usuarios
+// GetMyNotes godoc
+// @Summary Obtener notas del usuario logueado
+// @Description Devuelve las notas del usuario autenticado
 // @Tags notes
 // @Produce json
-// @Success 200 {array} models.Notes
-// @Failure 500 {object} models.ErrorResponse
-// @Security ApiKeyAuth
-// @Router /notes [get]
-func (nc *NotesController) GetAllNotes(c *gin.Context) {
-	notesModel := models.NotesModel{DB: nc.DB}
-
-	notes, err := notesModel.GetAll()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, notes)
-}
-
-// GetNotesByUserID godoc
-// @Summary Obtener notas de un usuario
-// @Description Devuelve las notas de un usuario por su ID
-// @Tags notes
-// @Produce json
-// @Param user_id path int true "ID del usuario"
 // @Success 200 {array} models.Notes
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Security ApiKeyAuth
-// @Router /notes/user/{user_id} [get]
-func (nc *NotesController) GetNotesByUserID(c *gin.Context) {
-	userIDParam := c.Param("user_id")
-	userID, err := strconv.Atoi(userIDParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de usuario inválido"})
+// @Router /notes/my [get]
+func (nc *NotesController) GetMyNotes(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
 		return
 	}
 
 	notesModel := models.NotesModel{DB: nc.DB}
-	notes, err := notesModel.GetByUserID(userID)
+	notes, err := notesModel.GetByUserID(userID.(int))
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Notas no encontradas"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "No tienes notas"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
@@ -69,16 +46,23 @@ func (nc *NotesController) GetNotesByUserID(c *gin.Context) {
 
 // GetNoteByID godoc
 // @Summary Obtener nota por ID
-// @Description Devuelve una nota específica por su ID
+// @Description Devuelve una nota específica si pertenece al usuario logueado
 // @Tags notes
 // @Produce json
 // @Param id path int true "ID de la nota"
 // @Success 200 {object} models.Notes
+// @Failure 403 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Security ApiKeyAuth
 // @Router /notes/{id} [get]
 func (nc *NotesController) GetNoteByID(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
+		return
+	}
+
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -97,27 +81,42 @@ func (nc *NotesController) GetNoteByID(c *gin.Context) {
 		return
 	}
 
+	// Validar que la nota sea del usuario logueado
+	if note.UserId != userID.(int) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No tienes acceso a esta nota"})
+		return
+	}
+
 	c.JSON(http.StatusOK, note)
 }
 
 // CreateNote godoc
 // @Summary Crear una nota
-// @Description Crea una nueva nota para un usuario
+// @Description Crea una nueva nota para el usuario logueado
 // @Tags notes
 // @Accept json
 // @Produce json
-// @Param note body models.Notes true "Datos de la nota"
+// @Param note body models.Notes true "Datos de la nota (note_text)"
 // @Success 201 {object} models.Notes
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Security ApiKeyAuth
 // @Router /notes [post]
 func (nc *NotesController) CreateNote(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
+		return
+	}
+
 	var note models.Notes
 	if err := c.ShouldBindJSON(&note); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Forzar el userID del contexto
+	note.UserId = userID.(int)
 
 	notesModel := models.NotesModel{DB: nc.DB}
 	if err := notesModel.Insert(&note); err != nil {
@@ -130,7 +129,7 @@ func (nc *NotesController) CreateNote(c *gin.Context) {
 
 // UpdateNote godoc
 // @Summary Actualizar nota
-// @Description Actualiza el texto de una nota por ID
+// @Description Actualiza el texto de una nota por ID si pertenece al usuario logueado
 // @Tags notes
 // @Accept json
 // @Produce json
@@ -138,11 +137,18 @@ func (nc *NotesController) CreateNote(c *gin.Context) {
 // @Param note body models.Notes true "Nuevo texto de la nota"
 // @Success 200 {object} models.Notes
 // @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Security ApiKeyAuth
 // @Router /notes/{id} [put]
 func (nc *NotesController) UpdateNote(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
+		return
+	}
+
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -157,7 +163,7 @@ func (nc *NotesController) UpdateNote(c *gin.Context) {
 	}
 
 	notesModel := models.NotesModel{DB: nc.DB}
-	err = notesModel.UpdateByID(id, note.NoteText)
+	existingNote, err := notesModel.GetByID(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Nota no encontrada"})
@@ -167,22 +173,41 @@ func (nc *NotesController) UpdateNote(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, note)
+	// Validar que sea del usuario
+	if existingNote.UserId != userID.(int) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No tienes acceso a esta nota"})
+		return
+	}
+
+	err = notesModel.UpdateByID(id, note.NoteText)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	existingNote.NoteText = note.NoteText
+	c.JSON(http.StatusOK, existingNote)
 }
 
 // DeleteNote godoc
 // @Summary Eliminar nota
-// @Description Elimina una nota por ID
+// @Description Elimina una nota por ID si pertenece al usuario logueado
 // @Tags notes
 // @Produce json
 // @Param id path int true "ID de la nota"
 // @Success 200 {object} map[string]string
-// @Failure 400 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Security ApiKeyAuth
 // @Router /notes/{id} [delete]
 func (nc *NotesController) DeleteNote(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
+		return
+	}
+
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -191,13 +216,24 @@ func (nc *NotesController) DeleteNote(c *gin.Context) {
 	}
 
 	notesModel := models.NotesModel{DB: nc.DB}
-	err = notesModel.DeleteByID(id)
+	existingNote, err := notesModel.GetByID(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Nota no encontrada"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
+		return
+	}
+
+	if existingNote.UserId != userID.(int) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No tienes acceso a esta nota"})
+		return
+	}
+
+	err = notesModel.DeleteByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
