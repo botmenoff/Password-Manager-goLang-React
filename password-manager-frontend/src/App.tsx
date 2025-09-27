@@ -1,49 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import theme from "./Constants";
 import AuthPanel from "./components/AuthPanel";
-import UserPage from "./pages/UserPage"; // Para usuarios logueados
+import UserPage from "./pages/UserPage";
 import Navbar from "./components/NavBar";
-// import Profile from "./pages/Profile";
 import ObsidianNotesDisplay from "./pages/ObsidianNotesDisplay";
 import { cookieService } from "./services/cookie.service";
 import SwaggerPage from "./pages/SwaggerPage";
 import AdminPage from "./pages/AdminPage";
+import NotesPage from "./pages/NotesPage";
 
 const App: React.FC = () => {
   const [hasToken, setHasToken] = useState<boolean | null>(null);
 
   useEffect(() => {
     const token = cookieService.getToken();
-    setHasToken(!!token); // true si hay token, false si no
+    setHasToken(!!token);
   }, []);
 
   if (hasToken === null) {
-    // Mientras verificamos el token
     return <div>Cargando...</div>;
   }
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline /> {/* Normaliza estilos y aplica background */}
+      <CssBaseline />
 
       {hasToken ? (
         <>
           <Navbar />
           <Routes>
-            <Route path="/" element={<UserPage />} />
-            {/* <Route path="/profile" element={<Profile />} /> */}
-            {/* <Route path="/users" element={<Users />} /> */}
-            <Route path="/login" element={<AuthPanel />} />
-            <Route path="/ObsidianNotesDisplay" element={<ObsidianNotesDisplay />} />
-            <Route path="/user" element={<UserPage />} /> {/* Tu página de usuario logueado */}
-            <Route path="/ApiDocs" element={<SwaggerPage />} />
-            <Route path="/users" element={<AdminPage />} />
+            {/* 🔹 Redirige el home a /notes */}
+            <Route path="/" element={<Navigate to="/notes" replace />} />
+
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/profile" element={<UserPage />} />
+            <Route path="/obsidian" element={<ObsidianNotesDisplay />} />
+            <Route path="/apidocs" element={<SwaggerPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </>
       ) : (
-        <AuthPanel />
+        <Routes>
+          <Route path="/login" element={<AuthPanel />} />
+          {/* Si no hay token, cualquier ruta redirige a login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
       )}
     </ThemeProvider>
   );
