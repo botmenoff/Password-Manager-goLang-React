@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"time"
 )
 
 type NotesModel struct {
@@ -10,9 +11,10 @@ type NotesModel struct {
 }
 
 type Notes struct {
-	Id       int    `json:"id"`
-	UserId   int    `json:"user_id"`
-	NoteText string `json:"note_text" binding:"required,min=3,max=255"`
+	Id        int       `json:"id"`
+	UserId    int       `json:"user_id"`
+	NoteText  string    `json:"note_text" binding:"required,min=3,max=255"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 // GetAll obtiene todas las notas
