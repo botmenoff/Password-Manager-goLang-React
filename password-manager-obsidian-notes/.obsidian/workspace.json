@@ -106,7 +106,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "964b68efb3b5d4d1",
@@ -200,8 +201,8 @@
   "active": "47b1eac06289f767",
   "lastOpenFiles": [
     "Proyecto.md",
-    "Bibliografia.md",
     "GoLang.md",
+    "Bibliografia.md",
     "Images",
     "Images/Pasted image 20250923185049.png",
     "Bienvenido.md",
