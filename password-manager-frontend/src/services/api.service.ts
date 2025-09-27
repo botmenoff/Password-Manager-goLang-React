@@ -4,6 +4,7 @@ import type { LoginResponse } from "../models/LoginRequest.models";
 import type { RegisterRequest } from "../models/RegisterRequest.model";
 import type { RegisterResponse } from "../models/RegisterRequest.model";
 import type { User } from "../models/User.model";
+import type { Note } from '../models/Notes.model'
 import { cookieService } from "./cookie.service";
 
 const API_BASE = "http://localhost:8080/api/v1";
@@ -119,3 +120,102 @@ export async function deleteUser(id: number): Promise<void> {
   }
 }
 
+export async function getMyNotes(): Promise<Note[]> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/my`, {
+    headers: {
+      Authorization: token,
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error obteniendo notas");
+  }
+
+  return res.json();
+}
+
+export async function getNoteById(id: number): Promise<Note> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/${id}`, {
+    headers: {
+      Authorization: token,
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error obteniendo nota");
+  }
+
+  return res.json();
+}
+
+export async function createNote(noteText: string): Promise<Note> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    credentials: "include",
+    body: JSON.stringify({ note_text: noteText }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error creando nota");
+  }
+
+  return res.json();
+}
+
+export async function updateNote(id: number, noteText: string): Promise<Note> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    credentials: "include",
+    body: JSON.stringify({ note_text: noteText }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error actualizando nota");
+  }
+
+  return res.json();
+}
+
+export async function deleteNote(id: number): Promise<void> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: token,
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error eliminando nota");
+  }
+}
