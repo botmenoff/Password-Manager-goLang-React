@@ -21,18 +21,6 @@ La aplicación es una especie de **gestor de contraseñas**, donde los usuarios 
 
 ---
 
-## 📚 Apuntes de Go
-
-En la web he añadido también una sección con **mis apuntes de Go**, donde recopilo lo que he ido aprendiendo durante el desarrollo:  
-
-- Manejo de **paquetes y módulos**  
-- Conexión a **MySQL** con `database/sql`  
-- Uso de **Gin** para crear rutas y middlewares  
-- Buenas prácticas en controladores y modelos  
-- Manejo de errores y respuestas JSON  
-
----
-
 ## 🛠️ Tecnologías usadas
 
 ### Frontend
@@ -51,12 +39,6 @@ En la web he añadido también una sección con **mis apuntes de Go**, donde rec
 - Swagger para documentación
 
 ---
-
-# 🔐 Password Manager
-
-Un proyecto **fullstack** desarrollado con **React, Go y MySQL**.  
-Es una especie de **gestor de contraseñas**, donde puedes guardar tus notas, usuarios y claves de forma organizada.  
-Además, en la propia aplicación he incluido mis **apuntes de Go** como parte de la práctica y el aprendizaje.
 
 ---
 
@@ -135,3 +117,94 @@ go mod tidy
 
 # Ejecutar servidor
 go run main.go
+
+---
+
+## 📚 Apuntes de Go
+
+Durante el desarrollo del proyecto he recopilado lo que he ido aprendiendo de Go.  
+Aquí tienes un resumen de los puntos más importantes:
+
+### 🚀 Características del lenguaje
+- **Concurrencia con goroutines y canales** → ligeras, ideales para servidores y microservicios.  
+- **Compilación ultra rápida** → binarios únicos y portables.  
+- **Simplicidad y uniformidad** → sintaxis minimalista, `gofmt` obligatorio.  
+- **Librería estándar potente** → HTTP, JSON, concurrencia, testing, etc.  
+
+### 🔤 Tipos básicos y valores iniciales
+- Números: `int`, `int8`, `uint`, `float32`, `complex128`  
+- Texto: `string`, `rune`, `byte`  
+- Booleanos: `bool`  
+- Valores iniciales: `0`, `false`, `""`  
+
+### 📝 Sintaxis esencial
+- Declaración corta: `x := 2`  
+- Funciones con múltiples retornos:  
+  ```go
+  func swap(x int, y string) (int, string) { return x, y }
+Bucles → solo existe for (también como while).
+
+if con asignación en línea.
+
+switch flexible (casos no constantes).
+
+📦 Estructuras de datos
+Arrays → tamaño fijo.
+
+Slices → dinámicos, con append, len y cap.
+
+Structs → agrupación de datos, compatibles con punteros.
+
+⚙️ Concurrencia
+Goroutines → go function() para ejecutar concurrentemente.
+
+Channels (no incluido arriba pero recomendable mencionar).
+
+defer → ejecutar al final de la función (ej: cerrar conexiones).
+
+🔗 Punteros
+&x → dirección de memoria.
+
+*p → valor apuntado.
+
+Go no permite aritmética de punteros (más seguro).
+
+🌐 API REST con Gin
+Controllers → reciben el Context (c *gin.Context).
+
+Routes → agrupar endpoints en routers (r.Group("/users")).
+
+Middlewares → validar y guardar datos en el contexto antes de los controladores.
+
+📦 Modelos y JSON
+Campos deben iniciar en mayúscula para ser exportados.
+
+Se usa json:"nombreCampo" para serialización.
+
+🔒 Seguridad
+JWT → RegisteredClaims + CustomClaims para email/roles.
+
+bcrypt → GenerateFromPassword y CompareHashAndPassword para hash de contraseñas.
+
+🛠️ Comandos útiles de Go
+sh
+Copy code
+# Ejecutar directamente
+go run main.go
+
+# Compilar binario
+go build -o app main.go
+
+# Inicializar módulo
+go mod init nombreDelModulo
+go mod tidy   # descargar y limpiar dependencias
+
+# Testing
+go test ./...     # todos los paquetes
+go test -v ./...  # con detalles
+
+# Formatear
+go fmt ./...
+
+# Cross compiling
+GOOS=linux GOARCH=amd64 go build -o app main.go
