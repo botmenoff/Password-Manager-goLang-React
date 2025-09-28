@@ -147,45 +147,45 @@ if con asignación en línea.
 
 switch flexible (casos no constantes).
 
-#### 📦 Estructuras de datos
+### 📦 Estructuras de datos
 Arrays → tamaño fijo.
 
 Slices → dinámicos, con append, len y cap.
 
 Structs → agrupación de datos, compatibles con punteros.
 
-#### ⚙️ Concurrencia
+### ⚙️ Concurrencia
 Goroutines → go function() para ejecutar concurrentemente.
 
 Channels (no incluido arriba pero recomendable mencionar).
 
 defer → ejecutar al final de la función (ej: cerrar conexiones).
 
-#### 🔗 Punteros
+### 🔗 Punteros
 &x → dirección de memoria.
 
 *p → valor apuntado.
 
 Go no permite aritmética de punteros (más seguro).
 
-#### 🌐 API REST con Gin
+### 🌐 API REST con Gin
 Controllers → reciben el Context (c *gin.Context).
 
 Routes → agrupar endpoints en routers (r.Group("/users")).
 
 Middlewares → validar y guardar datos en el contexto antes de los controladores.
 
-#### 📦 Modelos y JSON
+### 📦 Modelos y JSON
 Campos deben iniciar en mayúscula para ser exportados.
 
 Se usa json:"nombreCampo" para serialización.
 
-#### 🔒 Seguridad
+### 🔒 Seguridad
 JWT → RegisteredClaims + CustomClaims para email/roles.
 
 bcrypt → GenerateFromPassword y CompareHashAndPassword para hash de contraseñas.
 
-#### 🛠️ Comandos útiles de Go
+### 🛠️ Comandos útiles de Go
 sh
 Copy code
 ##### Ejecutar directamente
