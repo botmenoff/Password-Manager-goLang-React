@@ -395,3 +395,37 @@ func (nc *NotesController) VerifyNotePassword(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Contraseña correcta"})
 }
+
+// GetSortedNotesFixed godoc
+// @Summary Obtener notas ordenadas (contraseñas primero, luego por título)
+// @Description Devuelve notas del usuario, primero las que tienen contraseña, luego ordenadas por título
+// @Tags notes
+// @Produce json
+// @Param order query string false "ASC o DESC" default(ASC)
+// @Success 200 {array} models.Notes
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /notes/sorted-fixed [get]
+func (nc *NotesController) GetSortedNotesFixed(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario no autorizado"})
+		return
+	}
+
+	order := c.Query("order")
+
+	notesModel := models.NotesModel{DB: nc.DB}
+	notes, err := notesModel.GetByUserIDSortedFixed(userID.(int), order)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "No tienes notas"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, notes)
+}
