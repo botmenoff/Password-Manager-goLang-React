@@ -5,11 +5,14 @@ import { getMyNotes, createNote, updateNote, deleteNote, getMyNotesSortedByPassw
 import NotesTable from "../components/NotesTable";
 import NoteDialog from "../components/NoteDialog";
 import ConfirmDialog from "../components/ConfirmDialog";
+import SearchBar from "../components/SearchBar"; // 👈 importamos
 
 const NotesPage: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC"); // <-- nuevo estado
+  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
+
+  const [searchTerm, setSearchTerm] = useState(""); // 👈 estado buscador
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
@@ -65,7 +68,7 @@ const NotesPage: React.FC = () => {
   const handleSortByPassword = async () => {
     try {
       setLoading(true);
-      const newOrder = sortOrder === "ASC" ? "DESC" : "ASC"; // alterna orden
+      const newOrder = sortOrder === "ASC" ? "DESC" : "ASC";
       const sortedNotes = await getMyNotesSortedByPassword(newOrder);
       setNotes(sortedNotes);
       setSortOrder(newOrder);
@@ -76,19 +79,34 @@ const NotesPage: React.FC = () => {
     }
   };
 
+  // Filtrar en frontend
+  const filteredNotes = notes.filter(note =>
+    note.note_text.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => { fetchNotes(); }, []);
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>Mis Notas</Typography>
-      <Button variant="contained" color="primary" onClick={handleCreate}>Nueva Nota</Button>
+
+      <Box display="flex" alignItems="center" gap={2} sx={{ mb: 2 }}>
+        <Button variant="contained" color="primary" onClick={handleCreate}>
+          Nueva Nota
+        </Button>
+        <Box sx={{ flex: 1 }}>
+          <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Buscar por título" />
+        </Box>
+      </Box>
+
       {loading ? <Typography sx={{ mt: 2 }}>Cargando...</Typography> :
         <NotesTable
-          notes={notes}
+          notes={filteredNotes}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           onSortByPassword={handleSortByPassword}
         />}
+
       <NoteDialog
         open={openDialog} note={editingNote} noteText={noteText} username={username} password={password}
         onClose={() => setOpenDialog(false)} onSave={handleSave}
