@@ -1,6 +1,7 @@
 import React from "react";
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from "@mui/material";
 import type { Note } from "../models/Notes.model";
+import PasswordSuggester from "./PasswordSuggester";
 
 interface NoteDialogProps {
     open: boolean;
@@ -25,7 +26,7 @@ const NoteDialog: React.FC<NoteDialogProps> = ({
         <DialogContent>
             <TextField fullWidth margin="dense" label="Título" value={noteText} onChange={(e) => onChangeNoteText(e.target.value)} />
             <TextField fullWidth margin="dense" label="Username" value={username} onChange={(e) => onChangeUsername(e.target.value)} />
-            <TextField fullWidth margin="dense" label="Password" type="password" value={password} onChange={(e) => onChangePassword(e.target.value)} />
+            <PasswordSuggester password={password} onChange={onChangePassword}/>
         </DialogContent>
         <DialogActions>
             <Button onClick={onClose}>Cancelar</Button>
