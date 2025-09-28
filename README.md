@@ -38,7 +38,6 @@ La aplicación es una especie de **gestor de contraseñas**, donde los usuarios 
 - MySQL
 - Swagger para documentación
 
----
 
 ---
 
@@ -117,7 +116,7 @@ go mod tidy
 
 # Ejecutar servidor
 go run main.go
-
+```
 ---
 
 ## 📚 Apuntes de Go
