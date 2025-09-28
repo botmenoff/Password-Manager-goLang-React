@@ -9,21 +9,21 @@ import (
 	"password-manager-backend/internal/server"
 	"syscall"
 	"time"
+
+	"github.com/rs/cors"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
-	// Create context that listens for the interrupt signal from the OS.
+	// Escucha señales de interrupción (Ctrl+C)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Listen for the interrupt signal.
 	<-ctx.Done()
 
 	log.Println("shutting down gracefully, press Ctrl+C again to force")
-	stop() // Allow Ctrl+C to force shutdown
+	stop() // Permite forzar cierre con Ctrl+C
 
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
+	// Contexto con timeout de 5 segundos para terminar solicitudes en curso
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := apiServer.Shutdown(ctx); err != nil {
@@ -31,26 +31,35 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	}
 
 	log.Println("Server exiting")
-
-	// Notify the main goroutine that the shutdown is complete
 	done <- true
 }
 
 func main() {
-	server := server.NewServer()
+	// Crea el servidor original
+	apiServer := server.NewServer()
 
-	// Create a done channel to signal when the shutdown is complete
+	// Envuelve el handler con CORS
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Cambia por el dominio/IP de tu frontend
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
+	apiServer.Handler = c.Handler(apiServer.Handler)
+
+	// Canal para esperar el cierre del servidor
 	done := make(chan bool, 1)
 
-	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
+	// Ejecuta el shutdown en una goroutine separada
+	go gracefulShutdown(apiServer, done)
 
-	err := server.ListenAndServe()
+	log.Printf("Starting server on port %s...", apiServer.Addr)
+	err := apiServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
 	}
 
-	// Wait for the graceful shutdown to complete
 	<-done
 	log.Println("Graceful shutdown complete.")
 }
