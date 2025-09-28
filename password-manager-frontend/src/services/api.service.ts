@@ -19,7 +19,7 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
     credentials: "include", // si usas cookies HttpOnly
   });
   console.log(res);
-  
+
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(errorData.error || "Error en login");
@@ -158,7 +158,7 @@ export async function getNoteById(id: number): Promise<Note> {
   return res.json();
 }
 
-export async function createNote(noteText: string): Promise<Note> {
+export async function createNote(noteText: string, username: string, password: string): Promise<Note> {
   const token = cookieService.getToken();
   if (!token) throw new Error("No token found");
 
@@ -169,7 +169,7 @@ export async function createNote(noteText: string): Promise<Note> {
       Authorization: token,
     },
     credentials: "include",
-    body: JSON.stringify({ note_text: noteText }),
+    body: JSON.stringify({ note_text: noteText, username, password }),
   });
 
   if (!res.ok) {
@@ -180,7 +180,8 @@ export async function createNote(noteText: string): Promise<Note> {
   return res.json();
 }
 
-export async function updateNote(id: number, noteText: string): Promise<Note> {
+
+export async function updateNote(id: number, noteText: string, username: string, password: string): Promise<Note> {
   const token = cookieService.getToken();
   if (!token) throw new Error("No token found");
 
@@ -191,7 +192,7 @@ export async function updateNote(id: number, noteText: string): Promise<Note> {
       Authorization: token,
     },
     credentials: "include",
-    body: JSON.stringify({ note_text: noteText }),
+    body: JSON.stringify({ note_text: noteText, username, password }),
   });
 
   if (!res.ok) {
@@ -218,4 +219,26 @@ export async function deleteNote(id: number): Promise<void> {
     const err = await res.json();
     throw new Error(err.error || "Error eliminando nota");
   }
+}
+
+export async function verifyNotePassword(noteId: number, password: string): Promise<boolean> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/verify-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    credentials: "include",
+    body: JSON.stringify({ note_id: noteId, password }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error verificando contraseña");
+  }
+
+  return true;
 }
