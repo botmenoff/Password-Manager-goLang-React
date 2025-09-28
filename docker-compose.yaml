@@ -1,0 +1,40 @@
+services:
+  # MySQL container
+  mysql_bp:
+    image: mysql:latest
+    restart: unless-stopped
+    env_file:
+      - ./password-manager-backend/.env
+    ports:
+      - "${BLUEPRINT_DB_PORT}:3306"
+    volumes:
+      - mysql_volume_bp:/var/lib/mysql
+
+  # Backend container (Go)
+  backend:
+    build:
+      context: ./password-manager-backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql_bp
+    environment:
+      BLUEPRINT_DB_HOST: mysql_bp
+      BLUEPRINT_DB_PORT: ${BLUEPRINT_DB_PORT}
+    command: sh -c "./wait-for-mysql.sh"
+
+  # Frontend container (React/Node)
+  frontend:
+    build:
+      context: ./password-manager-frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_volume_bp:
