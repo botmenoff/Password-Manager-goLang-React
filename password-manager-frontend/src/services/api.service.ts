@@ -242,3 +242,20 @@ export async function verifyNotePassword(noteId: number, password: string): Prom
 
   return true;
 }
+
+export async function getMyNotesSortedByPassword(order: "ASC" | "DESC" = "ASC"): Promise<Note[]> {
+  const token = cookieService.getToken();
+  if (!token) throw new Error("No token found");
+
+  const res = await fetch(`${API_BASE}/notes/sorted-password?order=${order}`, {
+    headers: { Authorization: token },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error obteniendo notas ordenadas por contraseña");
+  }
+
+  return res.json();
+}

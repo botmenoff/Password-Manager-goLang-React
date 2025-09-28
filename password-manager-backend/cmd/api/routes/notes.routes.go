@@ -16,6 +16,7 @@ func NotesRoutes(rg *gin.RouterGroup, db *sql.DB) {
 
 	notes.GET("/my", middlewares.IsLogged(&userModel), notesController.GetMyNotes)
 	notes.GET("/:id", middlewares.IsLogged(&userModel), notesController.GetNoteByID)
+	notes.GET("/sorted-password", middlewares.IsLogged(&userModel), notesController.GetSortedNotesFixed)
 	notes.POST("/", middlewares.IsLogged(&userModel), notesController.CreateNote)
 	notes.POST("/verify-password", middlewares.IsLogged(&userModel), notesController.VerifyNotePassword)
 	notes.PUT("/:id", middlewares.IsLogged(&userModel), notesController.UpdateNote)
