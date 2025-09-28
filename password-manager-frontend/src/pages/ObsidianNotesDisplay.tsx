@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
-import ReactMarkdown from "react-markdown";
-import { Box, Pagination, CircularProgress } from "@mui/material";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Box, CircularProgress } from "@mui/material";
+import MarkdownViewer from "../components/MarkdownViwer";
+import MarkdownPagination from "../components/MarkdownPagination";
+import ScrollButtons from "../components/ScrollButtons";
 
 const ObsidianNotesDisplay: React.FC = () => {
-  // Lista de archivos Markdown en public/docs/
-  const files = [
-    "/docs/GoLang.md",
-    "/docs/Proyecto.md",
-  ];
+  const files = ["/docs/GoLang.md", "/docs/Proyecto.md"];
 
   const [page, setPage] = useState(1);
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -29,72 +25,16 @@ const ObsidianNotesDisplay: React.FC = () => {
         setLoading(false);
       }
     };
-
-    loadMarkdown();
+    void loadMarkdown();
   }, [page]);
 
-  const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
-  };
+  const handleChange = (_: React.ChangeEvent<unknown>, value: number) => setPage(value);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      px={2}
-      py={4}
-    >
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <Box
-          width="100%"
-          maxWidth={1000}
-          sx={{
-            border: "1px solid #ddd",
-            borderRadius: 2,
-            p: 3,
-            backgroundColor: "#fafafa",
-            mb: 2,
-            minHeight: 300,
-            overflowX: "auto",
-          }}
-        >
-          <ReactMarkdown
-            components={{
-              code({ inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || "");
-                return !inline && match ? (
-                  <SyntaxHighlighter
-                    style={oneDark}
-                    language={match[1]}
-                    PreTag="div"
-                    {...props}
-                  >
-                    {String(children).replace(/\n$/, "")}
-                  </SyntaxHighlighter>
-                ) : (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                );
-              },
-            }}
-          >
-            {content}
-          </ReactMarkdown>
-        </Box>
-      )}
-
-      <Pagination
-        count={files.length}
-        page={page}
-        onChange={handleChange}
-        color="primary"
-        sx={{ mt: 2 }}
-      />
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" px={2} py={4}>
+      {loading ? <CircularProgress /> : <MarkdownViewer content={content} />}
+      <MarkdownPagination count={files.length} page={page} onChange={handleChange} />
+      <ScrollButtons/>
     </Box>
   );
 };
