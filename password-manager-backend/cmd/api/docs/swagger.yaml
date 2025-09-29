@@ -18,16 +18,26 @@ definitions:
     type: object
   models.Notes:
     properties:
+      created_at:
+        type: string
       id:
         type: integer
       note_text:
         maxLength: 255
         minLength: 3
         type: string
+      password:
+        description: Lo puedes llenar luego con hash
+        type: string
       user_id:
         type: integer
+      username:
+        maxLength: 255
+        minLength: 3
+        type: string
     required:
     - note_text
+    - username
     type: object
   models.RegisterRequest:
     properties:
@@ -77,6 +87,13 @@ definitions:
     - password
     - username
     type: object
+  models.VerifyNotePasswordRequest:
+    properties:
+      note_id:
+        type: integer
+      password:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -86,7 +103,7 @@ paths:
       - application/json
       description: Crea una nueva nota para el usuario logueado
       parameters:
-      - description: Datos de la nota (note_text)
+      - description: Datos de la nota (note_text, username, password opcional)
         in: body
         name: note
         required: true
@@ -182,14 +199,15 @@ paths:
     put:
       consumes:
       - application/json
-      description: Actualiza el texto de una nota por ID si pertenece al usuario logueado
+      description: Actualiza el texto y username de una nota por ID si pertenece al
+        usuario logueado
       parameters:
       - description: ID de la nota
         in: path
         name: id
         required: true
         type: integer
-      - description: Nuevo texto de la nota
+      - description: Nuevo texto de la nota y username
         in: body
         name: note
         required: true
@@ -246,6 +264,142 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Obtener notas del usuario logueado
+      tags:
+      - notes
+  /notes/search:
+    get:
+      description: Devuelve todas las notas que contengan el texto buscado
+      parameters:
+      - description: Texto a buscar
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notes'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Buscar notas por texto
+      tags:
+      - notes
+  /notes/sorted-fixed:
+    get:
+      description: Devuelve notas del usuario, primero las que tienen contraseña,
+        luego ordenadas por título
+      parameters:
+      - default: ASC
+        description: ASC o DESC
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notes'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Obtener notas ordenadas (contraseñas primero, luego por título)
+      tags:
+      - notes
+  /notes/user/{user_id}:
+    get:
+      description: Devuelve todas las notas de un usuario dado
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Notes'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Obtener notas de un usuario específico
+      tags:
+      - notes
+  /notes/verify-password:
+    post:
+      consumes:
+      - application/json
+      description: Valida la contraseña proporcionada para una nota específica
+      parameters:
+      - description: ID de la nota y contraseña
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.VerifyNotePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Verificar contraseña de una nota
       tags:
       - notes
   /users:

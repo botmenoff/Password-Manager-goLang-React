@@ -35,7 +35,7 @@ const docTemplate = `{
                 "summary": "Crear una nota",
                 "parameters": [
                     {
-                        "description": "Datos de la nota (note_text)",
+                        "description": "Datos de la nota (note_text, username, password opcional)",
                         "name": "note",
                         "in": "body",
                         "required": true,
@@ -89,6 +89,219 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.Notes"
                             }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notes/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Devuelve todas las notas que contengan el texto buscado",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "Buscar notas por texto",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Texto a buscar",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notes"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notes/sorted-fixed": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Devuelve notas del usuario, primero las que tienen contraseña, luego ordenadas por título",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "Obtener notas ordenadas (contraseñas primero, luego por título)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "ASC",
+                        "description": "ASC o DESC",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notes"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notes/user/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Devuelve todas las notas de un usuario dado",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "Obtener notas de un usuario específico",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID del usuario",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Notes"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notes/verify-password": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Valida la contraseña proporcionada para una nota específica",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "Verificar contraseña de una nota",
+                "parameters": [
+                    {
+                        "description": "ID de la nota y contraseña",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VerifyNotePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
@@ -163,7 +376,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Actualiza el texto de una nota por ID si pertenece al usuario logueado",
+                "description": "Actualiza el texto y username de una nota por ID si pertenece al usuario logueado",
                 "consumes": [
                     "application/json"
                 ],
@@ -183,7 +396,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Nuevo texto de la nota",
+                        "description": "Nuevo texto de la nota y username",
                         "name": "note",
                         "in": "body",
                         "required": true,
@@ -658,9 +871,13 @@ const docTemplate = `{
         "models.Notes": {
             "type": "object",
             "required": [
-                "note_text"
+                "note_text",
+                "username"
             ],
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -669,8 +886,17 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 3
                 },
+                "password": {
+                    "description": "Lo puedes llenar luego con hash",
+                    "type": "string"
+                },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
                 }
             }
         },
@@ -738,6 +964,17 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 3
+                }
+            }
+        },
+        "models.VerifyNotePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "note_id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         }
