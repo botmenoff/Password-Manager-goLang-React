@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"password-manager-backend/cmd/api/models"
 	"password-manager-backend/cmd/api/services"
@@ -108,6 +109,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No body sent or malformed body"})
 		return
 	}
+	log.Printf("Login request body: %+v", body)
 
 	userModel := models.UserModel{DB: uc.DB}
 	// Buscar el usuario por email
