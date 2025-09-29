@@ -7,7 +7,7 @@ import type { User } from "../models/User.model";
 import type { Note } from '../models/Notes.model'
 import { cookieService } from "./cookie.service";
 
-const API_BASE = "http://localhost:8080/api/v1";
+const API_BASE = "http://localhost:8000/api/v1";
 
 export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
   const res = await fetch(`${API_BASE}/users/auth/login`, {
@@ -16,7 +16,7 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-    credentials: "include", // si usas cookies HttpOnly
+    credentials: "include",
   });
   console.log(res);
 
@@ -99,7 +99,7 @@ export async function getAllUsers(): Promise<User[]> {
     throw new Error(err.error || "Error fetching user data");
   }
 
-  return res.json(); // ahora será User[]
+  return res.json();
 }
 
 

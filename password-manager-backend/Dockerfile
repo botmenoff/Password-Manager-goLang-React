@@ -1,25 +1,23 @@
-# Etapa de construcción
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25-alpine
+
+# Instala dependencias necesarias (bash, git y make)
+RUN apk add --no-cache bash git make
+
+# Instala air (live reload)
+RUN go install github.com/air-verse/air@latest
 
 WORKDIR /app
+
+# Copiamos solo dependencias para cache
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+# Copiamos el Makefile (necesario para dev-migrate)
+COPY Makefile ./
+# Copiar .env dentro del contenedor
+COPY .env ./
+# El resto del código se montará como volumen en docker-compose
+# por eso no copiamos src aquí en modo dev.
 
-# Compilar backend
-RUN go build -o main ./cmd/api/main.go
-RUN go build -o migrate ./cmd/migrate/migrations/main.go
-
-# Etapa de producción
-FROM alpine:latest
-
-WORKDIR /app
-COPY --from=builder /app/main .
-COPY --from=builder /app/migrate .
-
-# Script para esperar MySQL, ejecutar migraciones y levantar backend
-COPY wait-for-mysql.sh .
-
-EXPOSE 8000
-CMD ["sh", "./wait-for-mysql.sh"]
+# Comando por defecto: corre migraciones y luego inicia con air
+CMD ["make", "dev-migrate"]

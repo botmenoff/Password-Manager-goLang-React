@@ -3,8 +3,11 @@ services:
   mysql_bp:
     image: mysql:latest
     restart: unless-stopped
-    env_file:
-      - ./password-manager-backend/.env
+    environment:
+      MYSQL_DATABASE: ${BLUEPRINT_DB_DATABASE}
+      MYSQL_USER: ${BLUEPRINT_DB_USERNAME}
+      MYSQL_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${BLUEPRINT_DB_ROOT_PASSWORD}
     ports:
       - "${BLUEPRINT_DB_PORT}:3306"
     volumes:
@@ -15,15 +18,21 @@ services:
     build:
       context: ./password-manager-backend
       dockerfile: Dockerfile
-    restart: unless-stopped
+    volumes:
+      - ./password-manager-backend:/app
+      - /app/bin
     ports:
       - "8000:8000"
     depends_on:
       - mysql_bp
+    command: make dev-migrate
     environment:
+      # 👇 Override de envs para asegurarnos de que usa mysql_bp como host
       BLUEPRINT_DB_HOST: mysql_bp
-      BLUEPRINT_DB_PORT: ${BLUEPRINT_DB_PORT}
-    command: sh -c "./wait-for-mysql.sh"
+      BLUEPRINT_DB_PORT: 3306
+      BLUEPRINT_DB_DATABASE: ${BLUEPRINT_DB_DATABASE}
+      BLUEPRINT_DB_USERNAME: ${BLUEPRINT_DB_USERNAME}
+      BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
 
   # Frontend container (React/Node)
   frontend:

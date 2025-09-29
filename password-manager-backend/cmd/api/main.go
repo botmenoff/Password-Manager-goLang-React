@@ -9,8 +9,6 @@ import (
 	"password-manager-backend/internal/server"
 	"syscall"
 	"time"
-
-	"github.com/rs/cors"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -35,26 +33,13 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
-	// Crea el servidor original
 	apiServer := server.NewServer()
 
-	// Envuelve el handler con CORS
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		AllowCredentials: true,
-	})
-
-	apiServer.Handler = c.Handler(apiServer.Handler)
-
-	// Canal para esperar el cierre del servidor
 	done := make(chan bool, 1)
-
-	// Ejecuta el shutdown en una goroutine separada
 	go gracefulShutdown(apiServer, done)
 
 	log.Printf("Starting server on port %s...", apiServer.Addr)
+	// Ejecuta directamente el router de Gin que ya tiene CORS
 	err := apiServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS notes (
     user_id INT NOT NULL,
     note_text VARCHAR(255) NOT NULL,
     username VARCHAR(255),
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) ,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
