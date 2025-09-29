@@ -19,7 +19,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	// Solo este CORS es suficiente
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
+		AllowOrigins:     []string{"http://localhost:3000"}, // Aquí pones el origen de tu frontend
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Authorization", "Content-Type", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
