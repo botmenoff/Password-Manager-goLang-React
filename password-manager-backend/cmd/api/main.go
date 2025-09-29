@@ -40,7 +40,7 @@ func main() {
 
 	// Envuelve el handler con CORS
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://192.168.1.170:3000"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
