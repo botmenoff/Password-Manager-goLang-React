@@ -76,7 +76,7 @@ Usuarios de ejemplo
 | alice@example.com   | alice   | 12345678       | ❌    |
 | bob@example.com     | bob     | 12345678       | ❌    |
 | charlie@example.com | charlie | 12345678       | ❌    |
-| admin@example.com   | admin   | (proporcionada)| ✅    |
+| admin@example.com   | admin   | ASDasd123@     | ✅    |
 ---
 
 ## 📚 Apuntes de Go
