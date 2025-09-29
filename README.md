@@ -70,15 +70,13 @@ JWT_SECRET=EJEMPLO
 
 ## 🧪 Datos de prueba
 Usuarios de ejemplo
-Email	Username	Contraseña	Admin
-alice@example.com
-	alice	12345678	❌
-bob@example.com
-	bob	12345678	❌
-charlie@example.com
-	charlie	12345678	❌
-admin@example.com
-	admin	(proporcionada)	✅
+
+| Email               | Username | Contraseña      | Admin |
+|--------------------|---------|----------------|-------|
+| alice@example.com   | alice   | 12345678       | ❌    |
+| bob@example.com     | bob     | 12345678       | ❌    |
+| charlie@example.com | charlie | 12345678       | ❌    |
+| admin@example.com   | admin   | (proporcionada)| ✅    |
 ---
 
 ## 📚 Apuntes de Go
