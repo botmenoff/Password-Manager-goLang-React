@@ -344,7 +344,7 @@ func (nc *NotesController) SearchNotes(c *gin.Context) {
 // @Tags notes
 // @Accept json
 // @Produce json
-// @Param body body struct{NoteID int `json:"note_id"`; Password string `json:"password"`} true "ID de la nota y contraseña"
+// @Param body body models.VerifyNotePasswordRequest true "ID de la nota y contraseña"
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 401 {object} models.ErrorResponse
