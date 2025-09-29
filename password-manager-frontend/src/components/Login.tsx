@@ -22,7 +22,11 @@ const Login: React.FC = () => {
             cookieService.setUser(data.user);
             // Aquí podrías redirigir al dashboard
             console.log("Login exitoso", data);
-            window.location.reload()
+            cookieService.setToken(data.token);
+            cookieService.setUser(data.user);
+            // recarga la app para que App lea el token
+            window.location.href = "/";
+
         } catch (err: unknown) {
             // Type guard
             if (err instanceof Error) {

@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"password-manager-backend/cmd/api/models"
 	"password-manager-backend/cmd/api/services"
@@ -108,6 +109,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No body sent or malformed body"})
 		return
 	}
+	log.Printf("Login request body: %+v", body)
 
 	userModel := models.UserModel{DB: uc.DB}
 	// Buscar el usuario por email
@@ -218,6 +220,21 @@ func (uc *UserController) GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// UpdateUser godoc
+// @Summary Actualizar usuario
+// @Description Actualiza el nombre de usuario y el email de un usuario específico
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "ID del usuario"
+// @Param user body models.UpdateUserRequest true "Datos a actualizar"
+// @Success 200 {object} map[string]string "Usuario actualizado correctamente"
+// @Failure 400 {object} models.ErrorResponse "ID inválido o body incorrecto"
+// @Failure 403 {object} models.ErrorResponse "No tienes permisos para actualizar este usuario"
+// @Failure 404 {object} models.ErrorResponse "Usuario no encontrado"
+// @Failure 500 {object} models.ErrorResponse "Error interno del servidor"
+// @Security ApiKeyAuth
+// @Router /users/{id} [put]
 func (uc *UserController) UpdateUser(c *gin.Context) {
 	// Verificar permisos desde el middleware
 	canSee, exists := c.Get("canSeePassword")
@@ -258,6 +275,18 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Usuario actualizado correctamente"})
 }
 
+// DeleteUser godoc
+// @Summary Eliminar usuario
+// @Description Elimina un usuario específico
+// @Tags users
+// @Param id path int true "ID del usuario"
+// @Success 200 {object} map[string]string "Usuario eliminado correctamente"
+// @Failure 400 {object} models.ErrorResponse "ID inválido"
+// @Failure 403 {object} models.ErrorResponse "No tienes permisos para eliminar este usuario"
+// @Failure 404 {object} models.ErrorResponse "Usuario no encontrado"
+// @Failure 500 {object} models.ErrorResponse "Error interno del servidor"
+// @Security ApiKeyAuth
+// @Router /users/{id} [delete]
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	// Verificar permisos desde el middleware
 	canSee, exists := c.Get("canSeePassword")
