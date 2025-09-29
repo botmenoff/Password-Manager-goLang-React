@@ -43,9 +43,42 @@ La aplicación es una especie de **gestor de contraseñas**, donde los usuarios 
 
 ## 📋 Requisitos
 
-Tener Docker Instalado 
-Y hacer en la raiz del proyecto
-docker compose up -d --build
+Tener docker instalado 
+
+
+## 🚀 Instalación y uso
+
+### Backend
+```bash
+# Clonar repositorio
+git clone https://github.com/usuario/password-manager.git
+cd password-manager-backend
+docker compose up -d
+
+# Variables de entorno en ./password-manager-backend/.env
+PORT=EJEMPLO
+APP_ENV=EJEMPLO
+BLUEPRINT_DB_HOST=EJEMPLO
+BLUEPRINT_DB_PORT=EJEMPLO
+BLUEPRINT_DB_DATABASE=EJEMPLO
+BLUEPRINT_DB_USERNAME=EJEMPLO
+BLUEPRINT_DB_PASSWORD=EJEMPLO
+BLUEPRINT_DB_ROOT_PASSWORD=EJEMPLO
+JWT_SECRET=EJEMPLO
+
+```
+
+## 🧪 Datos de prueba
+Usuarios de ejemplo
+Email	Username	Contraseña	Admin
+alice@example.com
+	alice	12345678	❌
+bob@example.com
+	bob	12345678	❌
+charlie@example.com
+	charlie	12345678	❌
+admin@example.com
+	admin	(proporcionada)	✅
 ---
 
 ## 📚 Apuntes de Go
