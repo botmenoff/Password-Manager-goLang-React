@@ -15,7 +15,6 @@ password-manager-frontend/pnpm-debug.log*
 password-manager-frontend/.pnp/
 password-manager-frontend/.pnp.js
 # Environment variables
-password-manager-frontend/.env
 password-manager-frontend/.env.local
 password-manager-frontend/.env.development.local
 password-manager-frontend/.env.test.local
